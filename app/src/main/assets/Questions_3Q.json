@@ -1,0 +1,16 @@
+{
+	"Langue" : "Français",
+	"Questions" : [
+		{ "Intitulé" : "Quel youtubeur a le plus d'abonné ?",
+		  "Difficulté": 0,
+		"Réponses": [ "Mister V", "Fuze III", "Furious Jumper", "OuahLeOuff"]}
+		,
+		{ "Intitulé" : "Quel est le jeu vidéo le plus joué en 2022 ?",
+		  "Difficulté": 0,
+		"Réponses": [ "Minecraft", "League of Legend", "Grand Theft Auto 5", "Apex Legends"]}
+		,
+		{ "Intitulé" : "Parmi ces consoles, laquelle est la plus chère ?",
+		  "Difficulté": 0,
+		"Réponses": [ "Play Station 4", "Nintendo Switch", "Wii U", "Nintendo 3DS XL"]}
+		]
+}

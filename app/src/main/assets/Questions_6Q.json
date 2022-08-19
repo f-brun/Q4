@@ -1,0 +1,28 @@
+{
+	"Langue" : "Français",
+	"Questions" : [
+		{ "Intitulé" : "Quel youtubeur a le plus d'abonné ?",
+		  "Difficulté": 0,
+		  "Réponses": [ "Mister V", "Fuze III", "Furious Jumper", "OuahLeOuff"]}
+		,
+		{ "Intitulé" : "Quel est le jeu vidéo le plus joué en 2022 ?",
+		  "Difficulté": 0,
+		  "Réponses": [ "Minecraft", "League of Legend", "Grand Theft Auto 5", "Apex Legends"]}
+		,
+		{ "Intitulé" : "Parmi ces consoles, laquelle est la plus chère ?",
+		  "Difficulté": 0,
+		  "Réponses": [ "Play Station 4", "Nintendo Switch", "Wii U", "Nintendo 3DS XL"]}
+		,
+		{   "Intitulé": "Qu'elle acteur interprète le premier rôle du film Inception ?",
+            "Difficulté": 0,
+            "Réponses": ["Leonardo di Caprio", "Tom Hanks", "Robert Downey Jr", "Brad Pitt"]}
+		,
+		{   "Intitulé": "Que signifie les initiales O.T.A.N ?",
+            "Difficulté": 0,
+            "Réponses": ["Organisation du Traité de l'Atlantique Nord", "Organisation des Territoires de l'Atlantique Nord", "Organisation du Traité de Aoste et Nuremberg", "La Réponse D"]}
+		,
+        {   "Intitulé": "Que signifie les initiales de C.I.A ?",
+            "Difficulté": 0,
+            "Réponses": ["Central Intelligence Agency", "Criminal Investigations Administration", "Coopérative Internationale des Agriculteurs", "Corporation Intelligence America"]}
+		]
+}
