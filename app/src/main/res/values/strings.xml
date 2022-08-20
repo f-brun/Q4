@@ -1,12 +1,15 @@
 <resources>
     <string name="app_name">Q4</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Paramètres</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Question...</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
+    <string name="first_fragment_label">Q4</string>
+    <string name="second_fragment_label">Question…</string>
+    <string name="next">Jouer</string>
     <string name="hello_first_fragment">Bienvenue dans Q4, le jeu de questions</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="hello_second_fragment">Fenêtre Questions</string>
+    <string name="rep_d">Rep_D</string>
+    <string name="rep_c">Rep_C</string>
+    <string name="rep_b">Rep_B</string>
+    <string name="rep_a">Rep_A</string>
+    <string name="question">Question</string>
 </resources>

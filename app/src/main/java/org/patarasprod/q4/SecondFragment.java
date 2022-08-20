@@ -24,6 +24,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     public Button[] listeBtnReponses  ;
     public int reponseCorrecte;
     public int reponseSelectionnee;
+    public Question question;
     private int[] LONGUEUR_TEXTE_BOUTON = {120, 80, 60, 45, 36, 23, 11};
     // Taille du texte sur 1, 2,3,4 ou 5 lignes et +
     private int[][] TAILLE_TEXTE = {{11, 12, 16, 18, 18, 20, 30},
@@ -45,13 +46,15 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
+/*        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(SecondFragment.this)
                         .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
         });
+
+ */
         // Initialise le tableau des bouttons réponse
         listeBtnReponses = new Button[4];
         listeBtnReponses[0] = binding.btnReponseA;
@@ -90,6 +93,9 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     }
 
     public void affiche_question() {
+        question = MainActivity.questions.choisiQuestion();
+        question.melange_reponses();
+        /*
         int[] ordreReponses = new int[4];
 
         // Initialisation du tableau de l'ordre des réponses
@@ -108,24 +114,16 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         for (int i = 0 ; i < 4 ; i++) {
             if (ordreReponses[i] == 0) reponseCorrecte = i;
         }
+*/
+        // Ecrit l'intitulé de la question dans le TextView
+        binding.TextViewIntituleQuestion.setText((CharSequence) question.intitule);
 
-        int nbQuestions = MainActivity.listeQuestions.length();
-        int noQuestion = ThreadLocalRandom.current().nextInt(nbQuestions);
-        JSONObject question;
-        try {
-            question = MainActivity.listeQuestions.getJSONObject(noQuestion);
-            binding.TextViewIntituleQuestion.setText((CharSequence) question.getString("Intitulé"));
-            JSONArray reponses = question.getJSONArray("Réponses");
-            // Fixe les textes des boutons réponse
-            for (int i = 0 ; i < 4 ; i++) {
-                listeBtnReponses[i].setText(reponses.getString(ordreReponses[i]));
-                int taille = determine_taille_texte(reponses.getString(ordreReponses[i]));
-                listeBtnReponses[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, taille);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        // Fixe les textes des boutons réponse
+        for (int i = 0 ; i < 4 ; i++) {
+            listeBtnReponses[i].setText(question.reponses[i]);
+            int taille = determine_taille_texte(question.reponses[i]);
+            listeBtnReponses[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, taille);
         }
-
         reponseSelectionnee = -1; // Aucune réponse sélectionnée
     }
 
@@ -148,7 +146,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
-        if (reponseSelectionnee == reponseCorrecte) {
+        if (question.est_correct(reponseSelectionnee)) {
             // Rend le bouton de la réponse vert
             listeBtnReponses[reponseSelectionnee].setBackgroundColor(0xFF00FF00);
             MainActivity.score ++;

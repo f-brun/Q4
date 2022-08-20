@@ -42,23 +42,21 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static Context context;
+    protected static Context context;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    static private String NOM_FICHIER_QUESTIONS = "Questions.json";
-    static JSONObject fichierQuestions ;
-    static JSONArray listeQuestions;
+    static private String NOM_FICHIER_QUESTIONS = "Questions";
     static AssetManager manager;
     static File repertoire;
     static ActionBar barreTitre;
     static int score ;
     static int coulBoutons;
+    static File repertoireFichiers;
+    static Questions questions; // Objet permettant l'interrogation de la base de questions
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        repertoire = getFilesDir();
-        manager = getAssets();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -68,19 +66,19 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
+        initialisations();
+    }
+
+    private void initialisations() {
+        repertoire = getFilesDir();
+        manager = getAssets();
         MainActivity.context = getApplicationContext();
-
-        Questions q = new Questions("Questions_3Q", manager);
-
-        try {
-            lecture_fichier_questions(NOM_FICHIER_QUESTIONS);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
         barreTitre = getSupportActionBar();
         coulBoutons = ((ColorDrawable) binding.toolbar.getBackground()).getColor();
+        repertoireFichiers = getFilesDir();
         score = 0;
+        // Initialise le système de questions
+        questions = new Questions(NOM_FICHIER_QUESTIONS, manager);
     }
 
     @Override
@@ -112,13 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    /*
     public static void lecture_fichier_questions(String nom_fichier) throws FileNotFoundException {
-/*        String[] fichiers;
-        try {
-            fichiers = manager.list("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         String contenu;
         InputStream fichier = null;
         try {
@@ -142,4 +135,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+     */
 }
