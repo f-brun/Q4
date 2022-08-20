@@ -12,17 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.patarasprod.q4.databinding.FragmentSecondBinding;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class SecondFragment extends Fragment implements View.OnClickListener {
 
     private FragmentSecondBinding binding;
     public Button[] listeBtnReponses  ;
-    public int reponseCorrecte;
     public int reponseSelectionnee;
     public Question question;
     private int[] LONGUEUR_TEXTE_BOUTON = {120, 80, 60, 45, 36, 23, 11};
@@ -95,26 +90,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     public void affiche_question() {
         question = MainActivity.questions.choisiQuestion();
         question.melange_reponses();
-        /*
-        int[] ordreReponses = new int[4];
 
-        // Initialisation du tableau de l'ordre des réponses
-        for (int i = 0 ; i < 4 ; i++) ordreReponses[i] = i ;
-
-        // Mélange de l'ordre
-        int j, temp ;
-        for (int i = 3 ; i >= 0 ; i--) {
-            j = ThreadLocalRandom.current().nextInt(i+1);
-            temp = ordreReponses[i];
-            ordreReponses[i] = ordreReponses[j];
-            ordreReponses[j] = temp;
-        }
-
-        // Détermination de la nouvelle position de la bonne réponse (la première initialement)
-        for (int i = 0 ; i < 4 ; i++) {
-            if (ordreReponses[i] == 0) reponseCorrecte = i;
-        }
-*/
         // Ecrit l'intitulé de la question dans le TextView
         binding.TextViewIntituleQuestion.setText((CharSequence) question.intitule);
 
@@ -146,7 +122,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
-        if (question.est_correct(reponseSelectionnee)) {
+        if (question.est_correct(reponseSelectionnee)) { // Si la réponse est correcte
             // Rend le bouton de la réponse vert
             listeBtnReponses[reponseSelectionnee].setBackgroundColor(0xFF00FF00);
             MainActivity.score ++;
@@ -159,6 +135,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
+                // On remet le bouton à sa couleur de base
                 listeBtnReponses[reponseSelectionnee].setBackgroundColor(MainActivity.coulBoutons);
                 affiche_question();  // Passe à la question suivante
             }

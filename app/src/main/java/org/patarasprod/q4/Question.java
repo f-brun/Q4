@@ -27,7 +27,7 @@ public class Question {
         int j;
         String temp ;
         for (int i = 3 ; i >= 0 ; i--) {
-            j = ThreadLocalRandom.current().nextInt(i+1);
+            j = MainActivity.alea.nextInt(i+1);
             temp = this.reponses[i];
             this.reponses[i] = this.reponses[j];
             this.reponses[j] = temp;

@@ -1,6 +1,7 @@
 package org.patarasprod.q4;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.AssetManager;
 import android.os.Build;
 
@@ -101,7 +102,7 @@ public class Questions {
             // Erreur : il faut créer un fichier vide
             System.out.println("Création d'un fichier vide pour " + nomFichierComplet);
             try {
-                FileOutputStream fichier = MainActivity.context.openFileOutput(
+                FileOutputStream fichier = MainActivity.wrapper.openFileOutput(
                         nomFichierComplet, Context.MODE_PRIVATE);
                 // On crée un tableau d'octets de 4 fois le nb de questions car on stocke
                 // les numéros des questions sur 4 octets (long)
@@ -137,7 +138,7 @@ public class Questions {
         // S'il n'y a plus de questions disponibles, on ré-initialise la liste
         if (questionsDisponibles.isEmpty()) initialiseQuestionsDisponibles();
         // Tire le numéro de la question à poser parmi les disponibles
-        int index = ThreadLocalRandom.current().nextInt(questionsDisponibles.size());
+        int index = MainActivity.alea.nextInt(questionsDisponibles.size());
         int noQuestion = (int) questionsDisponibles.get(index);
         questionsDisponibles.remove(index);                    // La retire des disponibles
 

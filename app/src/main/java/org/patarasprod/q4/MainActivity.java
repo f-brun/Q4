@@ -1,6 +1,7 @@
 package org.patarasprod.q4;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.AssetManager;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -37,12 +38,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Random;
 import java.util.Scanner;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    protected static Context context;
+//    protected static Context context;
+static ContextWrapper wrapper;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     static private String NOM_FICHIER_QUESTIONS = "Questions";
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     static int coulBoutons;
     static File repertoireFichiers;
     static Questions questions; // Objet permettant l'interrogation de la base de questions
+    protected static Random alea;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +76,15 @@ public class MainActivity extends AppCompatActivity {
     private void initialisations() {
         repertoire = getFilesDir();
         manager = getAssets();
-        MainActivity.context = getApplicationContext();
+        wrapper = new ContextWrapper(getApplicationContext());
+//        MainActivity.context = getApplicationContext();
         barreTitre = getSupportActionBar();
         coulBoutons = ((ColorDrawable) binding.toolbar.getBackground()).getColor();
         repertoireFichiers = getFilesDir();
         score = 0;
         // Initialise le système de questions
         questions = new Questions(NOM_FICHIER_QUESTIONS, manager);
+        alea = new Random(System.currentTimeMillis());
     }
 
     @Override
