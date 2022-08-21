@@ -1,6 +1,6 @@
 package org.patarasprod.q4;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 public class Question {
     String intitule;
@@ -8,6 +8,7 @@ public class Question {
     int difficulte;
     int noBonneReponse;
     String langue;
+    static Random alea = null;
 
     public Question(String intitule, String[] reponses) {
         this.intitule = intitule;
@@ -15,6 +16,7 @@ public class Question {
         this.difficulte = 0;
         this.noBonneReponse = 0;
         this.langue = "Français";
+        if (alea == null) alea = new Random(System.currentTimeMillis());
     }
 
     public Question(String intitule, String[] reponses, int noBonneReponse) {
@@ -27,7 +29,7 @@ public class Question {
         int j;
         String temp ;
         for (int i = 3 ; i >= 0 ; i--) {
-            j = MainActivity.alea.nextInt(i+1);
+            j = Question.alea.nextInt(i+1);
             temp = this.reponses[i];
             this.reponses[i] = this.reponses[j];
             this.reponses[j] = temp;

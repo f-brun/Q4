@@ -1,62 +1,25 @@
 package org.patarasprod.q4;
 
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.res.AssetManager;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.AssetManager;
-
-import android.view.View;
-
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.patarasprod.q4.databinding.ActivityMainBinding;
 
-import android.view.Menu;
-import android.view.MenuItem;
-
-// Bibliothèque pour les fichiers json
-import org.json.JSONArray;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.File;
-import java.io.InputStream;
 import java.util.Random;
-import java.util.Scanner;
-
 
 public class MainActivity extends AppCompatActivity {
 
-//    protected static Context context;
-static ContextWrapper wrapper;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    static private String NOM_FICHIER_QUESTIONS = "Questions";
-    static AssetManager manager;
-    static File repertoire;
-    static ActionBar barreTitre;
-    static int score ;
-    static int coulBoutons;
-    static File repertoireFichiers;
-    static Questions questions; // Objet permettant l'interrogation de la base de questions
-    protected static Random alea;
+    protected Config cfg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,17 +37,21 @@ static ContextWrapper wrapper;
     }
 
     private void initialisations() {
-        repertoire = getFilesDir();
-        manager = getAssets();
-        wrapper = new ContextWrapper(getApplicationContext());
-//        MainActivity.context = getApplicationContext();
-        barreTitre = getSupportActionBar();
-        coulBoutons = ((ColorDrawable) binding.toolbar.getBackground()).getColor();
-        repertoireFichiers = getFilesDir();
-        score = 0;
+        cfg = new Config();
+        cfg.repertoire = getFilesDir();
+        cfg.manager = getAssets();
+        cfg.contexte = getApplicationContext();
+        cfg.barreTitre = getSupportActionBar();
+        cfg.coulBoutons = ((ColorDrawable) binding.toolbar.getBackground()).getColor();
+        cfg.repertoireFichiers = getFilesDir();
+        cfg.score = 0;
         // Initialise le système de questions
-        questions = new Questions(NOM_FICHIER_QUESTIONS, manager);
-        alea = new Random(System.currentTimeMillis());
+        cfg.alea = new Random(System.currentTimeMillis());
+        cfg.questions = new Questions(cfg.NOM_FICHIER_QUESTIONS, cfg);
+    }
+
+    protected Config recupere_configuration() {
+        return this.cfg;
     }
 
     @Override
@@ -116,31 +83,10 @@ static ContextWrapper wrapper;
                 || super.onSupportNavigateUp();
     }
 
-    /*
-    public static void lecture_fichier_questions(String nom_fichier) throws FileNotFoundException {
-        String contenu;
-        InputStream fichier = null;
-        try {
-            fichier = manager.open(NOM_FICHIER_QUESTIONS);
-            Scanner sc = null;
-            sc = new Scanner(fichier);
-            // we just need to use \\Z as delimiter
-            sc.useDelimiter("\\Z");
-            contenu = sc.next();
-            try {
-                MainActivity.fichierQuestions = new JSONObject(contenu);
-                String langue = MainActivity.fichierQuestions.getString("Langue");
-                MainActivity.listeQuestions = MainActivity.fichierQuestions.getJSONArray("Questions");
-            } catch (JSONException e) {
-                System.out.println("Impossible d'analyser le fichier des questions");
-                e.printStackTrace();
-            }
-
-        } catch (IOException e) {
-            System.out.println("Impossible d'ouvrir le fichier des questions");
-            e.printStackTrace();
-        }
+    @Override
+    public void onDestroy() {
+        System.out.println("Fermeture de l'application");
+        cfg.questions.close();
+        super.onDestroy();
     }
-
-     */
 }

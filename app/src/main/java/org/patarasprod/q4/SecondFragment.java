@@ -10,19 +10,19 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.patarasprod.q4.databinding.FragmentSecondBinding;
 
 public class SecondFragment extends Fragment implements View.OnClickListener {
 
+    Config cfg;
     private FragmentSecondBinding binding;
     public Button[] listeBtnReponses  ;
     public int reponseSelectionnee;
     public Question question;
-    private int[] LONGUEUR_TEXTE_BOUTON = {120, 80, 60, 45, 36, 23, 11};
+    final private int[] LONGUEUR_TEXTE_BOUTON = {120, 80, 60, 45, 36, 23, 11};
     // Taille du texte sur 1, 2,3,4 ou 5 lignes et +
-    private int[][] TAILLE_TEXTE = {{11, 12, 16, 18, 18, 20, 30},
+    final private int[][] TAILLE_TEXTE = {{11, 12, 16, 18, 18, 20, 30},
                                     {11, 15, 15, 18, 20, 30, 30},
                                     {11, 15, 18, 20, 20, 30, 30},
                                     {11, 14, 18, 18, 20, 30, 30},
@@ -30,7 +30,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
         binding = FragmentSecondBinding.inflate(inflater, container, false);
@@ -48,8 +48,8 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
                         .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
         });
-
  */
+        this.cfg = ((MainActivity) requireActivity()).recupere_configuration();
         // Initialise le tableau des bouttons réponse
         listeBtnReponses = new Button[4];
         listeBtnReponses[0] = binding.btnReponseA;
@@ -58,9 +58,9 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         listeBtnReponses[3] = binding.btnReponseD;
 
         for (int i = 0 ; i < 4 ; i++) {
-            listeBtnReponses[i].setOnClickListener(this::onClick);
+            listeBtnReponses[i].setOnClickListener(this);
         }
-        MainActivity.barreTitre.setTitle("Score : " + MainActivity.score);
+        cfg.barreTitre.setTitle("Score : " + cfg.score);
         affiche_question();
     }
 
@@ -88,7 +88,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     }
 
     public void affiche_question() {
-        question = MainActivity.questions.choisiQuestion();
+        question = cfg.questions.choisiQuestion();
         question.melange_reponses();
 
         // Ecrit l'intitulé de la question dans le TextView
@@ -106,41 +106,27 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId() /*to get clicked view id**/) {
-            case R.id.btn_ReponseA:
-                reponseSelectionnee = 0;
-                break;
-            case R.id.btn_ReponseB:
-                reponseSelectionnee = 1;
-                break;
-            case R.id.btn_ReponseC:
-                reponseSelectionnee = 2;
-                break;
-            case R.id.btn_ReponseD:
-                reponseSelectionnee = 3;
-                break;
-            default:
-                break;
+        // On détermine le bouton cliqué
+        int[] idBoutons = {R.id.btn_ReponseA,R.id.btn_ReponseB,R.id.btn_ReponseC,R.id.btn_ReponseD};
+        int idObjetClique = view.getId();
+        for (int i = 0 ; i < idBoutons.length ; i++) {
+            if (idBoutons[i] == idObjetClique) reponseSelectionnee = i;
         }
         if (question.est_correct(reponseSelectionnee)) { // Si la réponse est correcte
             // Rend le bouton de la réponse vert
             listeBtnReponses[reponseSelectionnee].setBackgroundColor(0xFF00FF00);
-            MainActivity.score ++;
-            MainActivity.barreTitre.setTitle("Score : " + MainActivity.score);
+            cfg.score ++;
+            cfg.barreTitre.setTitle("Score : " + cfg.score);
         } else if (reponseSelectionnee >= 0) {
             listeBtnReponses[reponseSelectionnee].
                     setBackgroundColor(0xFFFF0000);
         } else return ;
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                // On remet le bouton à sa couleur de base
-                listeBtnReponses[reponseSelectionnee].setBackgroundColor(MainActivity.coulBoutons);
-                affiche_question();  // Passe à la question suivante
-            }
+        handler.postDelayed(() -> {
+            // On remet le bouton à sa couleur de base
+            listeBtnReponses[reponseSelectionnee].setBackgroundColor(cfg.coulBoutons);
+            affiche_question();  // Passe à la question suivante
         }, 1000); //1000 ms = 1.0 seconde avant de lancer le runnable
-
-
     }
 }

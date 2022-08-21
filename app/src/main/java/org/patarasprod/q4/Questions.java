@@ -1,12 +1,6 @@
 package org.patarasprod.q4;
 
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.res.AssetManager;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,52 +13,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Questions {
-    ArrayList questionsDejaPosees;
-    ArrayList questionsDisponibles;
+    String nomFichier, nomFichierJSON, nomFichierQDispo;
+    ArrayList<Integer> questionsDisponibles;
     int nbQuestionsTotales;
     JSONObject fichierQuestions;
     JSONArray listeQuestions;
+    Config cfg;
 
-    public Questions(String nomFichier, AssetManager manager) {
+    public Questions(String nomFichier, Config cfg) {
+        this.nomFichier = nomFichier;
+        this.nomFichierJSON = nomFichier + ".json";
+        this.nomFichierQDispo = nomFichier + "_disponibles.bin";
+        this.cfg = cfg;
         try {
-            lecture_fichier_questions(nomFichier, manager);
+            lecture_fichier_questions();
             nbQuestionsTotales = listeQuestions.length();
-            lecture_fichier_questions_disponibles(nomFichier, manager);
-            questionsDejaPosees = new ArrayList();
+            lecture_fichier_questions_disponibles();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private void lecture_fichier_questions(String nomFichier, AssetManager manager)
-            throws FileNotFoundException {
+    private void lecture_fichier_questions() throws FileNotFoundException {
         String contenu;
         InputStream fichier ;
         try {
-            fichier = manager.open(nomFichier + ".json");
+            fichier = cfg.manager.open(nomFichierJSON);
             Scanner sc = new Scanner(fichier);
             sc.useDelimiter("\\Z");
             contenu = sc.next();  // Lit le contenu jusqu'au délimiteur
             try {
                 fichierQuestions = new JSONObject(contenu);
-                String langue = fichierQuestions.getString("Langue");
+//                String langue = fichierQuestions.getString("Langue");
                 listeQuestions = fichierQuestions.getJSONArray("Questions");
             } catch (JSONException e) {
-                System.out.println("Impossible d'analyser le fichier des questions");
+                System.out.println("Impossible d'analyser le fichier des questions (" +
+                        nomFichierJSON + ")");
                 e.printStackTrace();
             }
             sc.close();
             try {
                 fichier.close();
             } catch (IOException ex) {
-                System.out.println("Impossible de fermer le fichier des questions");
+                System.out.println("Impossible de fermer le fichier des questions (" +
+                        nomFichierJSON + ")");
                 ex.printStackTrace();
             }
         } catch (IOException e) {
-            System.out.println("Impossible d'ouvrir le fichier des questions");
+            System.out.println("Impossible d'ouvrir le fichier des questions (" +
+                    nomFichierJSON + ")");
             e.printStackTrace();
         }
     }
@@ -76,20 +75,18 @@ public class Questions {
         System.out.println("Ré-initialisation des questions disponibles...");
     }
 
-    private void lecture_fichier_questions_disponibles(String nomFichier, AssetManager manager) {
-        String nomFichierComplet = nomFichier + "_disponibles.bin";
+    private void lecture_fichier_questions_disponibles() {
         byte[] contenu;
         int noQuestion;
-        questionsDisponibles = new ArrayList();
-        File rep = MainActivity.repertoireFichiers;
+        questionsDisponibles = new ArrayList<>();
+        File rep = cfg.repertoireFichiers;
         try {
-            File fichier = new File(rep,nomFichierComplet); // Récupère le fichier s'il existe
+            File fichier = new File(rep,nomFichierQDispo); // Récupère le fichier s'il existe
             int tailleFichier = (int) fichier.length();     // Détermine sa taille en octets
             contenu = new byte[tailleFichier];              // Réserve la mémoire pour le stocker
             FileInputStream f_in = new FileInputStream(fichier);
             f_in.read(contenu);                             // Lecture de la totalité du fichier
             f_in.close();
-            noQuestion = 0;
             // On boucle sur le fichier
             for (int i = 0 ; i < tailleFichier ; i += 4) {
                 // On reconstitue le numéro de question à partir des 4 octets
@@ -100,32 +97,9 @@ public class Questions {
         }
         catch (IOException e) {
             // Erreur : il faut créer un fichier vide
-            System.out.println("Création d'un fichier vide pour " + nomFichierComplet);
-            try {
-                FileOutputStream fichier = MainActivity.wrapper.openFileOutput(
-                        nomFichierComplet, Context.MODE_PRIVATE);
-                // On crée un tableau d'octets de 4 fois le nb de questions car on stocke
-                // les numéros des questions sur 4 octets (long)
-                byte[] numerosDisponibles = new byte[nbQuestionsTotales*4];
-                noQuestion = 0;
-                for (int i = 0 ; i < (nbQuestionsTotales*4) ; i+=4) {
-                    numerosDisponibles[i] = (byte) (noQuestion >>> 24) ;
-                    numerosDisponibles[i+1] = (byte) (noQuestion >>> 16) ;
-                    numerosDisponibles[i+2] = (byte) (noQuestion >>> 8) ;
-                    numerosDisponibles[i+3] = (byte) noQuestion ;
-                    // On en  profite pour ajouter cette question aux disponibles
-                    noQuestion++;
-                }
-                initialiseQuestionsDisponibles();
-                fichier.write(numerosDisponibles);
-                fichier.close();
-            } catch (FileNotFoundException ex) {
-                System.out.println("Impossible de créer le fichier " + nomFichierComplet);
-                ex.printStackTrace();
-            } catch (IOException ioException) {
-                System.out.println("I/O erroe sur le fichier " + nomFichierComplet);
-                ioException.printStackTrace();
-            }
+            System.out.println("Création d'un fichier vide pour " + nomFichierQDispo);
+            initialiseQuestionsDisponibles();
+            enregistre_questions_disponibles();
         }
     }
 
@@ -136,9 +110,12 @@ public class Questions {
      */
     public Question choisiQuestion() {
         // S'il n'y a plus de questions disponibles, on ré-initialise la liste
-        if (questionsDisponibles.isEmpty()) initialiseQuestionsDisponibles();
+        if (questionsDisponibles.isEmpty()) {
+            initialiseQuestionsDisponibles();
+            enregistre_questions_disponibles();
+        }
         // Tire le numéro de la question à poser parmi les disponibles
-        int index = MainActivity.alea.nextInt(questionsDisponibles.size());
+        int index = cfg.alea.nextInt(questionsDisponibles.size());
         int noQuestion = (int) questionsDisponibles.get(index);
         questionsDisponibles.remove(index);                    // La retire des disponibles
 
@@ -161,6 +138,37 @@ public class Questions {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void enregistre_questions_disponibles() {
+        int noQuestion, nbQuestions ;
+        try {
+            FileOutputStream fichier = cfg.contexte.openFileOutput(
+                    nomFichierQDispo, Context.MODE_PRIVATE);
+            nbQuestions = questionsDisponibles.size();
+            // On crée un tableau d'octets de 4 fois le nb de questions car on stocke
+            // les numéros des questions sur 4 octets (long)
+            byte[] numerosDisponibles = new byte[nbQuestions*4];
+            for (int i = 0 ; i < nbQuestions ; i++) {
+                noQuestion = (int) questionsDisponibles.get(i);
+                numerosDisponibles[4*i] = (byte) (noQuestion >>> 24) ;
+                numerosDisponibles[4*i+1] = (byte) (noQuestion >>> 16) ;
+                numerosDisponibles[4*i+2] = (byte) (noQuestion >>> 8) ;
+                numerosDisponibles[4*i+3] = (byte) noQuestion ;
+            }
+            fichier.write(numerosDisponibles);
+            fichier.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Impossible de créer le fichier " + nomFichierQDispo);
+            ex.printStackTrace();
+        } catch (IOException ioException) {
+            System.out.println("I/O error sur le fichier " + nomFichierQDispo);
+            ioException.printStackTrace();
+        }
+    }
+
+    public void close() {
+        enregistre_questions_disponibles();
     }
 }
 
