@@ -19,6 +19,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     private FragmentSecondBinding binding;
     public Button[] listeBtnReponses  ;
     public int reponseSelectionnee;
+    private boolean reponsePossible ;
     public Question question;
     final private int[] LONGUEUR_TEXTE_BOUTON = {120, 80, 60, 45, 36, 23, 11};
     // Taille du texte sur 1, 2,3,4 ou 5 lignes et +
@@ -94,13 +95,15 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         // Ecrit l'intitulé de la question dans le TextView
         binding.TextViewIntituleQuestion.setText((CharSequence) question.intitule);
 
-        // Fixe les textes des boutons réponse
+        // Fixe les textes des boutons réponse (valeur, taille et couleur du fond)
         for (int i = 0 ; i < 4 ; i++) {
             listeBtnReponses[i].setText(question.reponses[i]);
             int taille = determine_taille_texte(question.reponses[i]);
             listeBtnReponses[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, taille);
+            listeBtnReponses[i].setBackgroundColor(cfg.coulBoutons);
         }
         reponseSelectionnee = -1; // Aucune réponse sélectionnée
+        reponsePossible = true;   // Autorise les réponses
     }
 
 
@@ -112,20 +115,20 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         for (int i = 0 ; i < idBoutons.length ; i++) {
             if (idBoutons[i] == idObjetClique) reponseSelectionnee = i;
         }
-        if (question.est_correct(reponseSelectionnee)) { // Si la réponse est correcte
-            // Rend le bouton de la réponse vert
+        if (reponsePossible && question.est_correct(reponseSelectionnee)) {
+            // Si la réponse est correcte on met un fond vert au bouton de la réponse
             listeBtnReponses[reponseSelectionnee].setBackgroundColor(0xFF00FF00);
             cfg.score ++;
             cfg.barreTitre.setTitle("Score : " + cfg.score);
-        } else if (reponseSelectionnee >= 0) {
-            listeBtnReponses[reponseSelectionnee].
-                    setBackgroundColor(0xFFFF0000);
+            reponsePossible = false;    // Il n'est plus possible de répondre à cette question
+        } else if (reponsePossible && reponseSelectionnee >= 0) {
+            // Sinon si c'est une réponse fausse on met un fond rouge au bouton
+            listeBtnReponses[reponseSelectionnee].setBackgroundColor(0xFFFF0000);
+            reponsePossible = false;    // Il n'est plus possible de répondre à cette question
         } else return ;
 
         Handler handler = new Handler();
         handler.postDelayed(() -> {
-            // On remet le bouton à sa couleur de base
-            listeBtnReponses[reponseSelectionnee].setBackgroundColor(cfg.coulBoutons);
             affiche_question();  // Passe à la question suivante
         }, 1000); //1000 ms = 1.0 seconde avant de lancer le runnable
     }
