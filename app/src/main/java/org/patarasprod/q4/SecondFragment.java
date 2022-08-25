@@ -128,8 +128,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         } else return ;
 
         Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            affiche_question();  // Passe à la question suivante
-        }, 1000); //1000 ms = 1.0 seconde avant de lancer le runnable
+        // Passe à la question suivante
+        handler.postDelayed(this::affiche_question, 1000); //1000 ms = 1.0 seconde avant de lancer le runnable
     }
 }
